@@ -15,9 +15,9 @@
 
 ---
 
-## ⚡ درباره پروژه (About FastSTFP)
+## ⚡ Overview
 
-**FastSTFP** یک ابزار مدرن، فوق‌سریع و هوشمند برای همگام‌سازی و انتقال فایل‌های محلی به سرورهای لینوکس (VPS) از طریق پروتکل امن SFTP است. این ابزار به گونه‌ای مهندسی شده که فقط **محتویات داخل پوشه محلی** را به مقصد منتقل کند و با استفاده از سیستم‌های مانیتورینگ زنده، رابط کاربری پایانه را متحول کند.
+**FastSTFP** is a modern, blazing-fast, and intelligent CLI tool designed for synchronizing local files and folders to remote Linux servers (VPS) over secure SFTP. Engineered strictly to deploy only the **contents inside the specified local folder**, FastSTFP provides a sleek 24-bit TrueColor terminal experience, real-time transfer telemetry, dynamic progress tracking, and robust self-protection.
 
 ```text
   ███████╗ █████╗ ███████╗████████╗███████╗████████╗███████╗██████╗ 
@@ -28,51 +28,55 @@
   ╚═╝     ╚═╝  ╚═╝╚══════╝   ╚═╝   ╚══════╝   ╚═╝   ╚═╝     ╚═╝     
   ───────────────────────────────────────────────────────────────────
   FastSTFP │ High-Performance SFTP Sync Engine │ v1.0.0
-  Zero-Emoji ANSI 24-bit TrueColor Terminal System
+  Made by Coretify Studio
   ───────────────────────────────────────────────────────────────────
 ```
 
 ---
 
-## ✨ ویژگی‌های برجسته (Key Features)
+## ✨ Features
 
-- 🎨 **سیستم لاگ مدرن با پالت رنگی ۲۴ بیتی (24-bit TrueColor ANSI)**:
-  - رعایت قانون سخت‌گیرانه **Zero Emojis** برای حفظ یکدستی و زیبایی خروجی در تمام ترمینال‌ها (`[✓]`, `[✗]`, `[!]`, `[i]`).
-  - اسپینر چرخشی نرم Braille (`⠋ ⠙ ⠹ ...`) با قابلیت تطبیق در محیط‌های تعاملی TTY و CI/CD.
-  - نمایش میلی‌ثانیه‌ای زمان پینگ و تاخیر هر عملیات `(142ms)`.
-- 📊 **نوار پیشرفت زنده (Live Progress Bar)**:
-  - نمایش درصد پیشرفت با نوار گرافیکی اختصاصی.
-  - نمایش لحظه‌ای حجم منتقل‌شده، تعداد فایل‌ها و سرعت انتقال (`MB/s`).
-- 🛡️ **محافظت خودکار با اثر انگشت هش باینری (SHA-256 Self-Protection)**:
-  - برنامه هش فایل اجرایی خود را محاسبه می‌کند؛ حتی اگر نام فایل `.exe` به چیز دیگری تغییر کند یا درون پوشه همگام‌سازی قرار گیرد، شناسایی شده و هرگز به سرور VPS فرستاده نمی‌شود.
-- ⚙️ **فیلترهای باز و بسته کردن فایل‌ها (`ignore`)**:
-  - امکان فعال/غیرفعال‌سازی ارسال فایل‌ها و پوشه‌هایی مثل `node_modules`, `dist`, `.git`, `package-lock.json`, `README.md` به صورت `true`/`false`.
-- 🚀 **سیستم آپلود همزمان (Parallel Concurrency)**:
-  - ارسال همزمان چندین فایل برای به حداکثر رساندن سرعت انتقال در ارتباط با سرور.
-- 📦 **نسخه اجرایی مستقل (`.exe`)**:
-  - امکان تولید یک فایل `.exe` بدون نیاز به نصب هیچ‌گونه پیش‌نیاز یا Node.js، همراه با آیکون و متادیتای اختصاصی.
+- 🎨 **Modern 24-bit TrueColor ANSI Logging**:
+  - **Zero-Emoji Policy**: Clean, standardized Unicode bracketed badges (`[✓]`, `[✗]`, `[!]`, `[i]`) across all operating systems.
+  - **Interactive Braille Spinner**: Smooth 10-frame spinner (`⠋ ⠙ ⠹ ...`) for long-running operations with graceful non-TTY fallback.
+  - **Millisecond Latency Tracking**: Precise network latency and task duration reporting `(142ms)`.
+- 📊 **Real-Time Visual Progress Bar**:
+  - Dynamic gradient progress bar displaying upload percentage.
+  - Real-time transferred bytes vs. total size, dynamic speed calculation (`MB/s`), and active file indicator.
+- 🛡️ **Binary SHA-256 Hash Self-Protection**:
+  - Automatically identifies the running executable's binary SHA-256 signature.
+  - Even if `FastSTFP.exe` is renamed or placed inside the synchronization directory, it is detected and **excluded from VPS upload**.
+- ⚙️ **Flexible Ignore & Filter Rules**:
+  - Easy boolean toggles in `manage.json` to include or exclude files and folders like `node_modules`, `dist`, `.git`, `package-lock.json`, `README.md`.
+- 🚀 **Parallel Concurrency**:
+  - Multi-worker concurrent file uploading to saturate network bandwidth and minimize round-trip latency for thousands of small files.
+- 🛑 **Clean Terminal Hold on Exit**:
+  - Keeps the terminal window open after completion or errors until the user presses Enter or any key, preventing console windows from abruptly closing.
+- 📦 **Standalone Executable (`.exe`)**:
+  - Automated build pipeline producing a portable single-binary `FastSTFP.exe` with an embedded custom Cyber Neon app icon. Zero dependencies or Node.js runtime required on target machines.
 
 ---
 
-## 🚀 شروع سریع (Quick Start)
+## 🚀 Quick Start
 
-### ۱. کلون کردن ریپازیتوری
+### 1. Clone the Repository
 ```bash
 git clone https://github.com/thebx123/FastSTFP.git
 cd FastSTFP
 ```
 
-### ۲. نصب وابستگی‌ها
+### 2. Install Dependencies
 ```bash
 npm install
 ```
 
-### ۳. آماده‌سازی تنظیمات (`manage.json`)
-فایل نمونه را کپی کرده و اطلاعات سرور خود را در آن وارد کنید:
+### 3. Setup Configuration (`manage.json`)
+Copy the example configuration file:
 ```bash
 cp manage.example.json manage.json
 ```
 
+Configure your server credentials and paths:
 ```json
 {
   "host": "YOUR_SERVER_IP",
@@ -93,65 +97,85 @@ cp manage.example.json manage.json
 }
 ```
 
-### ۴. اجرا
+### 4. Run FastSTFP
 ```bash
 npm start
 ```
-یا در حالت توسعه و مشاهده زنده تغییرات (Watch mode):
+
+For live reload during development:
 ```bash
 npm run dev
 ```
 
 ---
 
-## 🛠️ ساخت نسخه مستقل ویندوز (`.exe`)
+## ⚙️ Configuration Reference (`manage.json`)
 
-برای ساخت فایل اجرایی تکی ویندوز همراه با آیکون Cyber Neon:
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| `host` | `string` | IP address or domain name of the remote Linux server / VPS. |
+| `port` | `number` | Remote SSH port (default: `22`). |
+| `username` | `string` | SSH username (e.g., `root` or `ubuntu`). |
+| `password` | `string` | Password for SSH/SFTP authentication (optional if using private key). |
+| `privateKeyPath`| `string` | Path to your SSH private key file (e.g., `id_rsa` or `~/.ssh/id_ed25519`). |
+| `localDir` | `string` | Path to the local source directory. **Only contents inside this directory are transferred.** |
+| `serverDir` | `string` | Destination path on the remote VPS (e.g., `/var/www/html`). |
+| `concurrency` | `number` | Number of simultaneous file upload workers (default: `4`). |
+| `ignore` | `object` | Key-value pairs where `true` excludes the item and `false` includes it. |
+
+---
+
+## 🛠️ Standalone Windows Build (`.exe`)
+
+Build a standalone, single-file Windows executable with the embedded custom Cyber Neon app icon:
 
 ```bash
 npm run build:exe
 ```
 
-پس از پایان بیلد، پوشه **`release/`** ایجاد می‌شود که شامل فایل‌های زیر است:
+The build pipeline automatically creates the **`release/`** directory:
 ```text
 release/
-├── FastSTFP.exe    # فایل اجرایی کامل و مستقل ویندوز (بدون نیاز به نصب Node.js)
-└── manage.json     # فایل کانفیگ اختصاصی کنار فایل exe
+├── FastSTFP.exe    # Standalone executable (no Node.js or npm needed)
+└── manage.json     # Ready-to-edit configuration file
 ```
-تنها کافیست این پوشه را در هر سیستم ویندوزی منتقل کرده و از آن استفاده نمایید.
+
+Simply copy the `release/` folder to any Windows machine, fill in `manage.json`, and run **`FastSTFP.exe`**!
 
 ---
 
-## 📂 ساختار کدهای پروژه (Project Structure)
+## 📂 Project Structure
 
 ```text
 FastSTFP/
 ├── assets/
-│   ├── icon.ico              # آیکون چندرزولوشن ویندوز
-│   └── logo.png              # لوگوی باکیفیت پروژه
+│   ├── icon.ico              # Multi-resolution Windows app icon (16x16 to 256x256)
+│   └── logo.png              # High-resolution vector raster logo
 ├── scripts/
-│   ├── build-exe.ts          # اسکریپت ساخت نسخه تک فایل .exe
-│   └── make-ico.ps1          # تبدیل کننده لوگو به فرمت آیکون ویندوز
+│   ├── build-exe.ts          # Standalone .exe compiler and packaging pipeline
+│   └── make-ico.ps1          # PowerShell icon generator script
 ├── src/
-│   ├── Config.ts             # ماژول خواندن و اعتبارسنجی کانفیگ
-│   ├── Logger.ts             # هسته لاگر TrueColor با اسپینر و پینگ
-│   ├── Protection.ts         # سیستم تشخیص هش باینری برای محافظت از ارسال خود فایل
-│   └── Transfer.ts           # اسکنر و موتور همگام‌سازی SFTP با نوار پیشرفت
-├── Index.ts                  # نقطه ورود اصلی برنامه
-├── manage.example.json       # فایل نمونه تنظیمات
+│   ├── Config.ts             # Configuration loader, validator, and path normalizer
+│   ├── Logger.ts             # TrueColor ANSI logger, braille spinner, and exit handler
+│   ├── Protection.ts         # Binary SHA-256 fingerprint self-protection engine
+│   └── Transfer.ts           # Recursive scanner and SFTP engine with progress bar
+├── Index.ts                  # Main entry point and orchestration lifecycle
+├── manage.example.json       # Template configuration file
 ├── package.json
 └── tsconfig.json
 ```
 
 ---
 
-## 🔒 امنیت و حریم خصوصی
+## 🔒 Security & Privacy
 
 > [!IMPORTANT]
-> فایل `manage.json` که حاوی پسورد سرور و مشخصات اتصال شماست در فایل `.gitignore` قرار گرفته و هیچ‌گاه در ریپازیتوری گیت کامیت نخواهد شد.
+> Your `manage.json` file contains sensitive server credentials and is strictly excluded by `.gitignore`. It will never be committed or pushed to your Git repository.
 
 ---
 
-## 📝 لایسنس
+## 📝 License & Credits
 
-این پروژه تحت لایسنس **MIT** منتشر شده است.
+This project is licensed under the **MIT License**.
+
+Crafted with precision by **Coretify Studio**.

@@ -52,7 +52,7 @@ function printBanner(): void {
     `  ${BOLD}\x1b[38;2;0;210;211mFastSTFP${RESET} ${DIM}│${RESET} High-Performance SFTP Sync Engine ${DIM}│${RESET} ${VALUE_COLOR}v1.0.0${RESET}`
   );
   console.log(
-    `  ${DIM}Zero-Emoji ANSI 24-bit TrueColor Terminal System${RESET}`
+    `  ${DIM}Made by Coretify Studio${RESET}`
   );
   console.log(`  ${DIM}${border}${RESET}\n`);
 }
