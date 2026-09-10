@@ -8,7 +8,8 @@
     "start": "tsx Index.ts",
     "dev": "tsx watch Index.ts",
     "build": "tsc",
-    "build:exe": "tsx scripts/build-exe.ts"
+    "build:exe": "tsx scripts/build-exe.ts",
+    "release": "node scripts/publish-release.cjs"
   },
   "keywords": [
     "sftp",
