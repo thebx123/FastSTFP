@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { logger } from "./Logger.js";
+import { logger, exitApp } from "./Logger.js";
 
 export interface ManageConfig {
   host: string;
@@ -17,7 +17,7 @@ export interface ManageConfig {
   ignoreList: string[];
 }
 
-export function loadConfig(configPath: string = "manage.json"): ManageConfig {
+export async function loadConfig(configPath: string = "manage.json"): Promise<ManageConfig> {
   let resolvedPath = path.resolve(process.cwd(), configPath);
 
   if (!fs.existsSync(resolvedPath)) {
@@ -51,18 +51,18 @@ export function loadConfig(configPath: string = "manage.json"): ManageConfig {
     fs.writeFileSync(resolvedPath, JSON.stringify(template, null, 2), "utf-8");
     logger.warn("Config", "manage.json not found. Created a template manage.json for you.");
     logger.warn("Config", "Please edit manage.json with your VPS credentials and run again.");
-    process.exit(1);
+    return await exitApp(1);
   }
 
-  let raw: string;
+  let raw = "";
   try {
     raw = fs.readFileSync(resolvedPath, "utf-8");
   } catch (err: any) {
     logger.error("Config", `Failed to read configuration file (${resolvedPath})`, err);
-    process.exit(1);
+    return await exitApp(1);
   }
 
-  let parsed: Partial<ManageConfig>;
+  let parsed: Partial<ManageConfig> = {};
   try {
     parsed = JSON.parse(raw);
   } catch (err: any) {
@@ -70,7 +70,7 @@ export function loadConfig(configPath: string = "manage.json"): ManageConfig {
       "Config",
       "Syntax error in manage.json. Please verify valid JSON formatting (quotes, commas)."
     );
-    process.exit(1);
+    return await exitApp(1);
   }
 
   // Validate required fields
@@ -79,12 +79,12 @@ export function loadConfig(configPath: string = "manage.json"): ManageConfig {
       "Config",
       "Invalid 'host' in manage.json. Please enter your VPS IP address or domain."
     );
-    process.exit(1);
+    return await exitApp(1);
   }
 
   if (!parsed.username || typeof parsed.username !== "string") {
     logger.error("Config", "Missing 'username' in manage.json (e.g., 'root').");
-    process.exit(1);
+    return await exitApp(1);
   }
 
   if (!parsed.password && !parsed.privateKey && !parsed.privateKeyPath) {
@@ -92,29 +92,29 @@ export function loadConfig(configPath: string = "manage.json"): ManageConfig {
       "Config",
       "No authentication provided. Please specify 'password' or 'privateKeyPath' in manage.json."
     );
-    process.exit(1);
+    return await exitApp(1);
   }
 
   if (!parsed.localDir || typeof parsed.localDir !== "string") {
     logger.error("Config", "Missing 'localDir' in manage.json (e.g., './upload').");
-    process.exit(1);
+    return await exitApp(1);
   }
 
   if (!parsed.serverDir || typeof parsed.serverDir !== "string") {
     logger.error("Config", "Missing 'serverDir' in manage.json (e.g., '/var/www/html').");
-    process.exit(1);
+    return await exitApp(1);
   }
 
   const resolvedLocalDir = path.resolve(process.cwd(), parsed.localDir);
   if (!fs.existsSync(resolvedLocalDir)) {
     logger.error("Config", `Local directory does not exist: "${resolvedLocalDir}"`);
-    process.exit(1);
+    return await exitApp(1);
   }
 
   const stat = fs.statSync(resolvedLocalDir);
   if (!stat.isDirectory()) {
     logger.error("Config", `Specified localDir is a file, not a directory: "${resolvedLocalDir}"`);
-    process.exit(1);
+    return await exitApp(1);
   }
 
   // Handle SSH Private Key if path is given
@@ -123,7 +123,7 @@ export function loadConfig(configPath: string = "manage.json"): ManageConfig {
     const keyPath = path.resolve(process.cwd(), parsed.privateKeyPath);
     if (!fs.existsSync(keyPath)) {
       logger.error("Config", `SSH private key file not found: "${keyPath}"`);
-      process.exit(1);
+      return await exitApp(1);
     }
     privateKeyContent = fs.readFileSync(keyPath, "utf-8");
   }

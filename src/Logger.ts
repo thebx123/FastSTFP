@@ -357,3 +357,61 @@ export async function runTask<T>(
     throw err;
   }
 }
+
+/**
+ * Pauses before exit so terminal/command prompt windows stay open for the user to review.
+ */
+export async function exitApp(code: number = 0): Promise<never> {
+  clearActiveSpinner();
+
+  const skipPause =
+    process.env.NO_PAUSE === "1" ||
+    process.env.CI === "true" ||
+    process.argv.includes("--no-wait");
+
+  if (!skipPause) {
+    try {
+      process.stdout.write(`\n  ${DIM}Press Enter to close this window...${RESET}\n`);
+
+      const readline = await import("node:readline");
+      const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+      });
+
+      if (process.stdin.isTTY && typeof process.stdin.setRawMode === "function") {
+        try {
+          process.stdin.setRawMode(true);
+          process.stdin.resume();
+          await new Promise<void>((resolve) => {
+            process.stdin.once("data", () => {
+              try {
+                process.stdin.setRawMode(false);
+              } catch {}
+              rl.close();
+              resolve();
+            });
+          });
+        } catch {
+          await new Promise<void>((resolve) => {
+            rl.question("", () => {
+              rl.close();
+              resolve();
+            });
+          });
+        }
+      } else {
+        await new Promise<void>((resolve) => {
+          rl.question("", () => {
+            rl.close();
+            resolve();
+          });
+        });
+      }
+    } catch {
+      // Fail-safe
+    }
+  }
+
+  process.exit(code);
+}

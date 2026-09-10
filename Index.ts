@@ -14,6 +14,7 @@ import {
   CATEGORY_COLORS,
   VALUE_COLOR,
   PING_COLOR,
+  exitApp,
 } from "./src/Logger.js";
 import { getSelfProtectionInfo } from "./src/Protection.js";
 
@@ -92,7 +93,7 @@ async function main() {
   printBanner();
 
   // 2. Load and validate manage.json
-  const config = loadConfig("manage.json");
+  const config = await loadConfig("manage.json");
 
   logger.info(
     "Config",
@@ -134,7 +135,7 @@ async function main() {
 
   if (scanResult.files.length === 0) {
     logger.warn("Transfer", `No files found inside ${config.localDir}. Nothing to transfer.`);
-    process.exit(0);
+    await exitApp(0);
   }
 
   // 4. Connect to remote SFTP server
@@ -181,7 +182,7 @@ async function main() {
     });
   } catch {
     await cleanup();
-    process.exit(1);
+    await exitApp(1);
   }
 
   // 5. 5-Second Countdown
@@ -197,7 +198,7 @@ async function main() {
     await transferFiles(sftp, scanResult, config.serverDir, config.concurrency || 4);
   } catch {
     await cleanup();
-    process.exit(1);
+    await exitApp(1);
   }
 
   // 7. Graceful close
@@ -208,9 +209,10 @@ async function main() {
 
   console.log("");
   logger.success("System", "All files transferred successfully. FastSTFP finished.");
+  await exitApp(0);
 }
 
-main().catch((err) => {
+main().catch(async (err) => {
   logger.error("System", "Fatal unhandled exception", err);
-  process.exit(1);
+  await exitApp(1);
 });

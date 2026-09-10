@@ -66,9 +66,9 @@ async function build() {
           FileDescription: "FastSTFP - High-Performance SFTP Transfer System",
           CompanyName: "FastSTFP",
           LegalCopyright: "2026 FastSTFP",
-          FileVersion: "1.0.0.0",
-          ProductVersion: "1.0.0.0",
         },
+        "file-version": "1.0.0.0",
+        "product-version": "1.0.0.0",
       });
       console.log("      Icon and metadata embedded into base binary successfully!");
     } catch (err: any) {
