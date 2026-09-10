@@ -128,11 +128,6 @@ async function build() {
       "utf-8"
     );
   }
-  fs.writeFileSync(
-    path.join(releaseDir, "manage.example.json"),
-    JSON.stringify(manageTemplate, null, 2),
-    "utf-8"
-  );
 
   // 5. Compute SHA-256 Hash of the final FastSTFP.exe
   const exeBuffer = fs.readFileSync(exePath);
