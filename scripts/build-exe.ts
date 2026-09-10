@@ -83,8 +83,15 @@ async function build() {
     { stdio: "inherit" }
   );
 
-  // 4. Copy template manage.json to release folder
-  console.log("[4/4] Preparing release folder with manage.json...");
+  // 4. Prepare release folder with manage.json and upload directory
+  console.log("[4/4] Preparing release folder...");
+  const releaseManagePath = path.join(releaseDir, "manage.json");
+  const releaseUploadDir = path.join(releaseDir, "upload");
+
+  if (!fs.existsSync(releaseUploadDir)) {
+    fs.mkdirSync(releaseUploadDir, { recursive: true });
+  }
+
   const manageTemplate = {
     host: "YOUR_SERVER_IP",
     port: 22,
@@ -102,8 +109,16 @@ async function build() {
       "README.md": false,
     },
   };
+
+  if (!fs.existsSync(releaseManagePath)) {
+    fs.writeFileSync(
+      releaseManagePath,
+      JSON.stringify(manageTemplate, null, 2),
+      "utf-8"
+    );
+  }
   fs.writeFileSync(
-    path.join(releaseDir, "manage.json"),
+    path.join(releaseDir, "manage.example.json"),
     JSON.stringify(manageTemplate, null, 2),
     "utf-8"
   );

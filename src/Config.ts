@@ -18,41 +18,61 @@ export interface ManageConfig {
 }
 
 export async function loadConfig(configPath: string = "manage.json"): Promise<ManageConfig> {
-  let resolvedPath = path.resolve(process.cwd(), configPath);
+  const candidateDirs = [
+    process.cwd(),
+    path.dirname(process.execPath),
+  ];
 
-  if (!fs.existsSync(resolvedPath)) {
-    const altPath = path.resolve(process.cwd(), "Manage.json");
-    if (fs.existsSync(altPath)) {
-      resolvedPath = altPath;
+  let resolvedPath: string | null = null;
+
+  for (const dir of candidateDirs) {
+    const p1 = path.resolve(dir, configPath);
+    if (fs.existsSync(p1)) {
+      resolvedPath = p1;
+      break;
+    }
+    const p2 = path.resolve(dir, "Manage.json");
+    if (fs.existsSync(p2)) {
+      resolvedPath = p2;
+      break;
     }
   }
 
-  if (!fs.existsSync(resolvedPath)) {
+  if (!resolvedPath) {
+    const targetDir = fs.existsSync(path.dirname(process.execPath))
+      ? path.dirname(process.execPath)
+      : process.cwd();
+    resolvedPath = path.resolve(targetDir, configPath);
+
     // Generate template manage.json if not present
     const template = {
-      host: "192.168.1.100",
+      host: "YOUR_SERVER_IP",
       port: 22,
       username: "root",
-      password: "your_vps_password",
+      password: "YOUR_PASSWORD",
       privateKeyPath: "",
-      localDir: "./files-to-upload",
+      localDir: "./upload",
       serverDir: "/var/www/my-site",
       concurrency: 4,
       ignore: {
-        "faststfp": true,
-        "manage.json": true,
-        "node_modules": true,
+        node_modules: true,
         ".git": true,
-        "dist": false,
+        dist: false,
         "package-lock.json": true,
-        "README.md": false
-      }
+        "README.md": false,
+      },
     };
-    fs.writeFileSync(resolvedPath, JSON.stringify(template, null, 2), "utf-8");
-    logger.warn("Config", "manage.json not found. Created a template manage.json for you.");
+    try {
+      fs.writeFileSync(resolvedPath, JSON.stringify(template, null, 2), "utf-8");
+      logger.warn("Config", `manage.json not found. Created a template manage.json at: ${resolvedPath}`);
+    } catch {
+      logger.warn("Config", "manage.json not found.");
+    }
     logger.warn("Config", "Please edit manage.json with your VPS credentials and run again.");
     return await exitApp(1);
   }
+
+  const configDir = path.dirname(resolvedPath);
 
   let raw = "";
   try {
@@ -74,7 +94,7 @@ export async function loadConfig(configPath: string = "manage.json"): Promise<Ma
   }
 
   // Validate required fields
-  if (!parsed.host || typeof parsed.host !== "string" || parsed.host.trim() === "YOUR_SERVER_IP") {
+  if (!parsed.host || typeof parsed.host !== "string" || parsed.host.trim() === "YOUR_SERVER_IP" || parsed.host.trim() === "192.168.1.100") {
     logger.error(
       "Config",
       "Invalid 'host' in manage.json. Please enter your VPS IP address or domain."
@@ -105,10 +125,22 @@ export async function loadConfig(configPath: string = "manage.json"): Promise<Ma
     return await exitApp(1);
   }
 
-  const resolvedLocalDir = path.resolve(process.cwd(), parsed.localDir);
+  let resolvedLocalDir = path.resolve(configDir, parsed.localDir);
   if (!fs.existsSync(resolvedLocalDir)) {
-    logger.error("Config", `Local directory does not exist: "${resolvedLocalDir}"`);
-    return await exitApp(1);
+    const cwdLocalDir = path.resolve(process.cwd(), parsed.localDir);
+    if (fs.existsSync(cwdLocalDir)) {
+      resolvedLocalDir = cwdLocalDir;
+    }
+  }
+
+  if (!fs.existsSync(resolvedLocalDir)) {
+    try {
+      fs.mkdirSync(resolvedLocalDir, { recursive: true });
+      logger.info("Config", `Created missing local directory: "${resolvedLocalDir}"`);
+    } catch {
+      logger.error("Config", `Local directory does not exist: "${resolvedLocalDir}"`);
+      return await exitApp(1);
+    }
   }
 
   const stat = fs.statSync(resolvedLocalDir);
@@ -120,7 +152,13 @@ export async function loadConfig(configPath: string = "manage.json"): Promise<Ma
   // Handle SSH Private Key if path is given
   let privateKeyContent = parsed.privateKey;
   if (parsed.privateKeyPath) {
-    const keyPath = path.resolve(process.cwd(), parsed.privateKeyPath);
+    let keyPath = path.resolve(configDir, parsed.privateKeyPath);
+    if (!fs.existsSync(keyPath)) {
+      const cwdKeyPath = path.resolve(process.cwd(), parsed.privateKeyPath);
+      if (fs.existsSync(cwdKeyPath)) {
+        keyPath = cwdKeyPath;
+      }
+    }
     if (!fs.existsSync(keyPath)) {
       logger.error("Config", `SSH private key file not found: "${keyPath}"`);
       return await exitApp(1);

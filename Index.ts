@@ -212,6 +212,16 @@ async function main() {
   await exitApp(0);
 }
 
+process.on("uncaughtException", async (err) => {
+  logger.error("System", "Uncaught exception", err);
+  await exitApp(1);
+});
+
+process.on("unhandledRejection", async (reason) => {
+  logger.error("System", "Unhandled rejection", reason);
+  await exitApp(1);
+});
+
 main().catch(async (err) => {
   logger.error("System", "Fatal unhandled exception", err);
   await exitApp(1);

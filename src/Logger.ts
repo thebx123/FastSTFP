@@ -1,3 +1,6 @@
+import { spawnSync } from "node:child_process";
+import fs from "node:fs";
+
 export type LogCategory =
   | "SFTP"
   | "Transfer"
@@ -371,45 +374,30 @@ export async function exitApp(code: number = 0): Promise<never> {
 
   if (!skipPause) {
     try {
-      process.stdout.write(`\n  ${DIM}Press Enter to close this window...${RESET}\n`);
-
-      const readline = await import("node:readline");
-      const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout,
-      });
-
-      if (process.stdin.isTTY && typeof process.stdin.setRawMode === "function") {
-        try {
-          process.stdin.setRawMode(true);
-          process.stdin.resume();
-          await new Promise<void>((resolve) => {
-            process.stdin.once("data", () => {
-              try {
-                process.stdin.setRawMode(false);
-              } catch {}
-              rl.close();
-              resolve();
-            });
-          });
-        } catch {
-          await new Promise<void>((resolve) => {
-            rl.question("", () => {
-              rl.close();
-              resolve();
-            });
-          });
+      if (process.platform === "win32") {
+        console.log("");
+        // Native Windows console pause - connects directly to CONIN$ and keeps console window open
+        const res = spawnSync("cmd.exe", ["/c", "pause"], { stdio: "inherit" });
+        if (res.error) {
+          throw res.error;
         }
       } else {
-        await new Promise<void>((resolve) => {
-          rl.question("", () => {
-            rl.close();
-            resolve();
-          });
-        });
+        process.stdout.write(`\n  ${DIM}Press Enter to close this window...${RESET}\n`);
+        const buf = Buffer.alloc(1);
+        fs.readSync(0, buf);
       }
     } catch {
-      // Fail-safe
+      try {
+        if (process.platform === "win32") {
+          const fd = fs.openSync("\\\\.\\CONIN$", "r");
+          const buf = Buffer.alloc(1);
+          fs.readSync(fd, buf);
+          fs.closeSync(fd);
+        } else {
+          const buf = Buffer.alloc(1);
+          fs.readSync(0, buf);
+        }
+      } catch {}
     }
   }
 
