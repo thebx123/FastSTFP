@@ -1,0 +1,33 @@
+{
+  "name": "faststfp",
+  "version": "1.0.0",
+  "description": "High-performance SFTP transfer tool with modern terminal aesthetics",
+  "main": "Index.ts",
+  "type": "module",
+  "scripts": {
+    "start": "tsx Index.ts",
+    "dev": "tsx watch Index.ts",
+    "build": "tsc",
+    "build:exe": "tsx scripts/build-exe.ts"
+  },
+  "keywords": [
+    "sftp",
+    "ssh",
+    "transfer",
+    "cli"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ssh2-sftp-client": "^12.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.19",
+    "@types/ssh2-sftp-client": "^9.0.6",
+    "@yao-pkg/pkg": "^6.14.2",
+    "esbuild": "^0.28.2",
+    "rcedit": "^4.0.1",
+    "tsx": "^4.19.3",
+    "typescript": "^5.7.3"
+  }
+}

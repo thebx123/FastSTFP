@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Build outputs & Distribution
+dist/
+release/
+
+# Sensitive Server Configurations (Keep manage.json private!)
+manage.json
+Manage.json
+*.pem
+*.key
+id_rsa
+id_ed25519
+
+# Local upload / testing directories
+upload/
+
+# Environment and Logs
+.env
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS specific files
+.DS_Store
+Thumbs.db

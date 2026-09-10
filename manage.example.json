@@ -1,0 +1,17 @@
+{
+  "host": "YOUR_SERVER_IP",
+  "port": 22,
+  "username": "root",
+  "password": "YOUR_PASSWORD",
+  "privateKeyPath": "",
+  "localDir": "./upload",
+  "serverDir": "/var/www/my-site",
+  "concurrency": 4,
+  "ignore": {
+    "node_modules": true,
+    ".git": true,
+    "dist": false,
+    "package-lock.json": true,
+    "README.md": false
+  }
+}
