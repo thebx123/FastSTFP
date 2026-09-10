@@ -65,27 +65,25 @@ async function build() {
     execSync("npx @yao-pkg/pkg-fetch -n node20 -p win -a x64", { stdio: "inherit" });
   }
 
-  // Always start from a clean fetched base binary to prevent corrupted PE headers
-  if (fs.existsSync(fetchedPath)) {
-    fs.copyFileSync(fetchedPath, builtPath);
-  }
-
-  if (fs.existsSync(builtPath) && fs.existsSync(iconPath)) {
-    try {
-      await rcedit(builtPath, {
-        icon: iconPath,
-        "version-string": {
-          ProductName: "FastSTFP",
-          FileDescription: "FastSTFP - High-Performance SFTP Transfer System",
-          CompanyName: "FastSTFP",
-          LegalCopyright: "2026 FastSTFP",
-        },
-        "file-version": "1.0.0.0",
-        "product-version": "1.0.0.0",
-      });
-      console.log("      Icon and metadata embedded into base binary successfully!");
-    } catch (err: any) {
-      console.warn("      Warning: Could not stamp icon on base binary:", err?.message || err);
+  // Stamp BOTH fetchedPath and builtPath so pkg ALWAYS uses the custom icon
+  for (const targetBinary of [fetchedPath, builtPath]) {
+    if (fs.existsSync(targetBinary) && fs.existsSync(iconPath)) {
+      try {
+        await rcedit(targetBinary, {
+          icon: iconPath,
+          "version-string": {
+            ProductName: "FastSTFP",
+            FileDescription: "FastSTFP - High-Performance SFTP Transfer System",
+            CompanyName: "FastSTFP",
+            LegalCopyright: "2026 FastSTFP",
+          },
+          "file-version": "1.0.0.0",
+          "product-version": "1.0.0.0",
+        });
+        console.log(`      Icon and metadata embedded into ${path.basename(targetBinary)} successfully!`);
+      } catch (err: any) {
+        console.warn(`      Warning: Could not stamp icon on ${path.basename(targetBinary)}:`, err?.message || err);
+      }
     }
   }
 

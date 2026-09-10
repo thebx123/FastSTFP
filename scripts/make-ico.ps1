@@ -120,4 +120,4 @@ foreach ($entry in $entries) {
 $bw.Close()
 $fs.Close()
 
-Write-Host "Created assets/icon.ico (multi-resolution 256..16) and assets/logo.png successfully!"
+Write-Host "Created assets/icon.ico (hybrid PNG+DIB multi-resolution 256..16) and assets/logo.png successfully!"
