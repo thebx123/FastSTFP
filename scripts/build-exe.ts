@@ -38,6 +38,18 @@ async function build() {
 
   // 2. Prepare Icon & Base Node Binary for pkg
   console.log("[2/4] Preparing custom Cyber Logo Icon and base binary...");
+
+  // Ensure latest icon.ico is freshly generated with rounded corners and zoomed graphics
+  const makeIcoScript = path.join(rootDir, "scripts", "make-ico.ps1");
+  if (fs.existsSync(makeIcoScript)) {
+    try {
+      execSync(`powershell -ExecutionPolicy Bypass -File "${makeIcoScript}"`, { stdio: "pipe" });
+      console.log("      High-resolution rounded/zoomed icon generated successfully!");
+    } catch (err: any) {
+      console.warn("      Warning: Could not regenerate icon:", err?.message || err);
+    }
+  }
+
   const userProfile = process.env.USERPROFILE || process.env.HOME || "";
   const cacheDir = path.join(userProfile, ".pkg-cache", "v3.5");
   const fetchedPath = path.join(cacheDir, "fetched-v20.20.2-win-x64");
@@ -48,12 +60,13 @@ async function build() {
   }
 
   // If fetched binary doesn't exist yet, download it once
-  if (!fs.existsSync(fetchedPath) && !fs.existsSync(builtPath)) {
+  if (!fs.existsSync(fetchedPath)) {
     console.log("      Fetching base Node 20 binary...");
     execSync("npx @yao-pkg/pkg-fetch -n node20 -p win -a x64", { stdio: "inherit" });
   }
 
-  if (fs.existsSync(fetchedPath) && !fs.existsSync(builtPath)) {
+  // Always start from a clean fetched base binary to prevent corrupted PE headers
+  if (fs.existsSync(fetchedPath)) {
     fs.copyFileSync(fetchedPath, builtPath);
   }
 
